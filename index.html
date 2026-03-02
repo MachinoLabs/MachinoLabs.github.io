@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MachinoLabs | High-Performance Digital Marketing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cyan: #00e5ff;
+            --dark-bg: #0a0a0a;
+            --card-bg: #161616;
+            --text-gray: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            line-height: 1.6;
+        }
+
+        /* Hero Section */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .agency-logo {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+
+        h1 span {
+            color: var(--cyan);
+            text-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+        }
+
+        p.subtitle {
+            font-size: 1.2rem;
+            color: var(--text-gray);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        /* Portfolio Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 20px;
+            padding: 40px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: white;
+            text-align: left;
+        }
+
+        .project-card:hover {
+            border-color: var(--cyan);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 229, 255, 0.1);
+        }
+
+        .project-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: var(--cyan);
+        }
+
+        .project-card p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--cyan);
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Contact Section */
+        .contact-box {
+            margin-top: 100px;
+            padding: 60px;
+            background: linear-gradient(145deg, #111, #000);
+            border-radius: 30px;
+            border: 1px solid var(--cyan);
+        }
+
+        .btn-call {
+            display: inline-block;
+            background: var(--cyan);
+            color: black;
+            text-decoration: none;
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-weight: 900;
+            margin-top: 20px;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            margin-top: 80px;
+            padding-bottom: 40px;
+            font-size: 0.8rem;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Your Logo -->
+        <img src="https://i.ibb.co/Xz958tG/machino-icon.png" alt="MachinoLabs Logo" class="agency-logo">
+        
+        <h1><span>Machino</span>Labs</h1>
+        <p class="subtitle">We build interactive digital experiences that stop the scroll and drive immediate revenue for local businesses.</p>
+
+        <div class="grid">
+            <!-- PROJECT 1: MARK'S PIZZA -->
+            <a href="https://MachinoLabs.github.io/marks-pizza/" class="project-card">
+                <span class="badge">Live Demo</span>
+                <h3>Mark's Pizza</h3>
+                <p>Digital Gold-Foil Scratch-Off with randomized menu rewards and instant call-to-order integration.</p>
+                <div style="font-weight: bold; color: white;">View Case Study →</div>
+            </a>
+
+            <!-- PROJECT 2: SALON (PLACEHOLDER) -->
+            <div class="project-card" style="opacity: 0.5; cursor: default;">
+                <span class="badge">In Development</span>
+                <h3>Luxury Spa & Salon</h3>
+                <p>Interactive "Mystery Treatment" reveal app designed for high-end beauty service providers.</p>
+            </div>
+        </div>
+
+        <div class="contact-box">
+            <h2>Ready to scale your business?</h2>
+            <p style="color: var(--text-gray); margin-top: 10px;">Contact Joe for a custom digital strategy session.</p>
+            <a href="tel:7176232907" class="btn-call">CALL JOE: 717.623.2907</a>
+        </div>
+
+        <footer>
+            © 2024 MachinoLabs • Built by Joe
+        </footer>
+    </div>
+
+</body>
+</html>
