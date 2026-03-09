@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Spin To Win — Kylie Ryan Beauty</title>
+  <style>
+    :root{
+      --bg1:#3D245E;
+      --bg2:#1A0F29;
+      --primary:#2E1A47;
+      --accent:#D4AF37;
+      --accent2:#F9E29C;
+      --text:#FFFFFF;
+      --muted:rgba(255,255,255,.75);
+      --card:rgba(255,255,255,.08);
+      --card2:rgba(255,255,255,.12);
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 800px at 30% 20%, var(--bg1), var(--bg2));
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      overflow-x:hidden;
+    }
+    .wrap{
+      width:min(980px, 100%);
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:18px;
+      align-items:stretch;
+    }
+    @media (max-width: 860px){
+      .wrap{grid-template-columns:1fr}
+    }
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:14px;
+    }
+    .logoMark{
+      width:44px;height:44px;border-radius:14px;
+      background: radial-gradient(circle at 30% 30%, var(--accent2), var(--accent));
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      display:grid;place-items:center;
+      flex:0 0 auto;
+      color:#2b1a46;
+      font-weight:900;
+      letter-spacing:.5px;
+    }
+    .brand h1{
+      font-size:22px;
+      margin:0;
+      line-height:1.15;
+      letter-spacing:.2px;
+    }
+    .brand p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .wheelStage{
+      display:grid;
+      place-items:center;
+      padding:6px 0 10px;
+    }
+    .wheelShell{
+      width:min(420px, 92vw);
+      aspect-ratio:1/1;
+      position:relative;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+    }
+    canvas#wheel{
+      width:100%;
+      height:100%;
+      border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow: 0 22px 60px rgba(0,0,0,.45);
+    }
+    .pointer{
+      position:absolute;
+      top:-6px;
+      left:50%;
+      transform:translateX(-50%);
+      width:0;height:0;
+      border-left:16px solid transparent;
+      border-right:16px solid transparent;
+      border-bottom:26px solid var(--accent);
+      filter: drop-shadow(0 6px 10px rgba(0,0,0,.35));
+    }
+    .centerCap{
+      position:absolute;
+      width:86px;height:86px;
+      border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, var(--accent2), var(--accent));
+      display:grid;
+      place-items:center;
+      box-shadow: 0 20px 50px rgba(0,0,0,.35);
+      border: 4px solid rgba(255,255,255,.28);
+    }
+    .centerCap span{
+      color:#2b1a46;
+      font-weight:900;
+      text-transform:uppercase;
+      font-size:12px;
+      letter-spacing:1.2px;
+      text-align:center;
+      padding:0 8px;
+      line-height:1.05;
+    }
+
+    .controls{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    button{
+      appearance:none;
+      border:0;
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:800;
+      letter-spacing:.2px;
+      cursor:pointer;
+      transition: transform .06s ease, filter .2s ease, opacity .2s ease;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    button:active{transform: translateY(1px) scale(.99);}
+    .btnPrimary{
+      background: linear-gradient(180deg, var(--accent2), var(--accent));
+      color:#2b1a46;
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      min-width: 210px;
+    }
+    .btnGhost{
+      background: rgba(255,255,255,.08);
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .btnPrimary[disabled], .btnGhost[disabled]{
+      opacity:.55;
+      cursor:not-allowed;
+      filter:saturate(.7);
+    }
+
+    .info{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .card{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      padding:14px;
+    }
+    .card h2{
+      margin:0 0 8px;
+      font-size:16px;
+      letter-spacing:.2px;
+    }
+    .card p{
+      margin:0;
+      color:var(--muted);
+      font-size:13.5px;
+      line-height:1.45;
+    }
+    .fine{
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(255,255,255,.65);
+    }
+    .list{
+      margin:10px 0 0;
+      padding:0 0 0 18px;
+      color:rgba(255,255,255,.80);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    /* Prize modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      padding:18px;
+      background: rgba(0,0,0,.55);
+      z-index:20;
+    }
+    .modal.show{display:grid}
+    .modalCard{
+      width:min(520px, 100%);
+      background: linear-gradient(180deg, rgba(46,26,71,.96), rgba(26,15,41,.96));
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 22px;
+      box-shadow: 0 26px 80px rgba(0,0,0,.60);
+      padding:16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .modalTop{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:8px;
+    }
+    .badge{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      padding:10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      font-weight:900;
+      letter-spacing:.4px;
+      text-transform:uppercase;
+      font-size:12px;
+    }
+    .xBtn{
+      width:38px;height:38px;border-radius:12px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text);
+      font-weight:900;
+      cursor:pointer;
+    }
+    .prizeBig{
+      margin:10px 0 6px;
+      font-size:26px;
+      line-height:1.08;
+      letter-spacing:.2px;
+      font-weight:1000;
+    }
+    .prizeDesc{
+      margin:0 0 12px;
+      color:rgba(255,255,255,.85);
+      font-size:14px;
+      line-height:1.4;
+    }
+    .codeBox{
+      background: rgba(255,255,255,.08);
+      border:1px dashed rgba(255,255,255,.25);
+      border-radius: 16px;
+      padding:12px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:.8px;
+    }
+    .hint{
+      margin:0 0 12px;
+      color:rgba(255,255,255,.78);
+      font-size:13px;
+      line-height:1.45;
+    }
+    .modalActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .footerLines{
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid rgba(255,255,255,.10);
+      color:rgba(255,255,255,.72);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    /* Confetti overlay */
+    canvas#confetti{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+      z-index:15;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="brand">
+        <div class="logoMark" id="logoMark">KR</div>
+        <div>
+          <h1 id="bizName">Kylie Ryan Beauty</h1>
+          <p id="tagline">Bridal & Airbrush Excellence.</p>
+        </div>
+      </div>
+
+      <div class="wheelStage">
+        <div class="wheelShell" aria-label="Spin to win wheel">
+          <div class="pointer" aria-hidden="true"></div>
+          <canvas id="wheel" width="900" height="900"></canvas>
+          <div class="centerCap" aria-hidden="true"><span>SPIN<br>TO<br>WIN</span></div>
+        </div>
+
+        <div class="controls">
+          <button class="btnPrimary" id="spinBtn">SPIN THE WHEEL</button>
+          <button class="btnGhost" id="resetBtn" title="Clear local spin lock">RESET</button>
+        </div>
+
+        <div class="fine" id="limitText"></div>
+      </div>
+    </div>
+
+    <div class="panel info">
+      <div class="card">
+        <h2>How this works</h2>
+        <p>
+          Tap <strong>SPIN THE WHEEL</strong>. When the wheel stops, a prize and claim code appear.
+          Use the <strong>Tap to Call</strong> button and mention the code when booking.
+        </p>
+        <ul class="list" id="prizeList"></ul>
+      </div>
+
+      <div class="card">
+        <h2>Location</h2>
+        <p id="locLine"></p>
+        <div class="fine" id="footerLine1"></div>
+        <div class="fine" id="footerLine2"></div>
+      </div>
+
+      <div class="card">
+        <h2>Notes</h2>
+        <p>
+          This wheel is Business-DNA driven. Colors, copy, prizes, and CTA come from the JSON block.
+          Confetti triggers automatically after the spin ends on any prize.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prize Modal -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-label="Prize">
+    <div class="modalCard">
+      <div class="modalTop">
+        <div class="badge">Prize Unlocked</div>
+        <button class="xBtn" id="closeModal" aria-label="Close">✕</button>
+      </div>
+
+      <div class="prizeBig" id="winAmount">FREE</div>
+      <div class="prizeDesc" id="winDesc">AIRBRUSH FOUNDATION UPGRADE</div>
+
+      <div class="codeBox">
+        <div>
+          <div style="font-size:12px;color:rgba(255,255,255,.75);font-weight:800;letter-spacing:.3px;">CLAIM CODE</div>
+          <div class="code" id="winCode">GLOW</div>
+        </div>
+        <button class="btnGhost" id="copyBtn">COPY</button>
+      </div>
+
+      <p class="hint" id="claimLine">Mention code GLOW when booking!</p>
+
+      <div class="modalActions">
+        <a id="callLink" href="tel:4802990336" style="text-decoration:none;">
+          <button class="btnPrimary" id="callBtn">TAP TO CALL: (480) 299-0336</button>
+        </a>
+        <button class="btnGhost" id="spinAgainBtn">SPIN AGAIN</button>
+      </div>
+
+      <div class="footerLines">
+        <div id="modalFooter1"></div>
+        <div id="modalFooter2"></div>
+        <div style="margin-top:6px" id="modalLimit"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================
+   BUSINESS DNA (PASTE-READY)
+   ========================= */
+const DNA = {
+  "businessName": "Kylie Ryan Beauty",
+  "tagline": "Bridal & Airbrush Excellence.",
+  "offerType": "Scratch-Off Promotion",
+  "callToAction": {
+    "buttonText": "TAP TO CALL: (480) 299-0336",
+    "phoneDisplay": "(480) 299-0336",
+    "phoneTel": "tel:4802990336",
+    "claimLine": "Mention code {CODE} when booking!"
+  },
+  "location": {
+    "city": "Lebanon",
+    "state": "PA",
+    "addressLine": "840 Norman Dr",
+    "footerLine1": "840 NORMAN DR, LEBANON • 2025 QUALITY AWARD WINNER",
+    "footerLine2": "BRIDAL • AIRBRUSH • ON-SITE COORDINATION"
+  },
+  "terms": {
+    "limitText": "* Limit one coupon per client. New bridal bookings only."
+  },
+  "branding": {
+    "logoStyle": "Styled Text",
+    "primaryBackground": "#2E1A47",
+    "accent": "#D4AF37",
+    "accentLight": "#F9E29C",
+    "bodyRadialStart": "#3D245E",
+    "bodyRadialEnd": "#1A0F29",
+    "textColor": "#FFFFFF"
+  },
+  "prizes": [
+    { "amount": "FREE", "description": "AIRBRUSH FOUNDATION UPGRADE", "code": "GLOW" },
+    { "amount": "$20 OFF", "description": "BRIDAL MAKEUP TRIAL", "code": "BRIDE20" },
+    { "amount": "FREE", "description": "LASH APPLICATION ADD-ON", "code": "LASHES" },
+    { "amount": "10% OFF", "description": "BRIDAL PARTY BOOKING", "code": "PARTY10" },
+    { "amount": "FREE", "description": "TOUCH-UP KIT FOR BRIDES", "code": "KIT" },
+    { "amount": "$15 OFF", "description": "EVENT HAIR & MAKEUP PKG", "code": "EVENT15" },
+    { "amount": "FREE", "description": "LIP GLOSS SOUVENIR", "code": "GLOSS" },
+    { "amount": "20% OFF", "description": "RETAIL BEAUTY PRODUCTS", "code": "RETAIL20" },
+    { "amount": "$50 OFF", "description": "FULL WEDDING DAY SERVICES", "code": "WED50" },
+    { "amount": "MYSTERY", "description": "ARTIST'S CHOICE UPGRADE", "code": "MYSTERY" }
+  ],
+  "rarePrizeOdds": "Standard Randomization"
+};
+
+/* =========================
+   CONFIG
+   ========================= */
+const WEDGE_COUNT = 8; // change to 10 to include all prizes
+const LOCK_MODE = "perDevice"; // "none" | "perDevice" | "perDay"
+const STORAGE_KEY = "spinToWinLock_v1";
+
+/* =========================
+   APPLY BRANDING
+   ========================= */
+(function applyBrand(){
+  const b = DNA.branding || {};
+  document.documentElement.style.setProperty("--bg1", b.bodyRadialStart || "#3D245E");
+  document.documentElement.style.setProperty("--bg2", b.bodyRadialEnd || "#1A0F29");
+  document.documentElement.style.setProperty("--primary", b.primaryBackground || "#2E1A47");
+  document.documentElement.style.setProperty("--accent", b.accent || "#D4AF37");
+  document.documentElement.style.setProperty("--accent2", b.accentLight || "#F9E29C");
+  document.documentElement.style.setProperty("--text", b.textColor || "#FFFFFF");
+
+  const name = DNA.businessName || "Spin To Win";
+  const tag = DNA.tagline || "";
+  document.title = "Spin To Win — " + name;
+
+  const initials = (name.match(/\b\w/g) || []).slice(0,2).join("").toUpperCase() || "WIN";
+  document.getElementById("logoMark").textContent = initials;
+
+  document.getElementById("bizName").textContent = name;
+  document.getElementById("tagline").textContent = tag;
+
+  const loc = DNA.location || {};
+  document.getElementById("locLine").textContent = `${loc.addressLine || ""} • ${loc.city || ""}, ${loc.state || ""}`.replace(/^ • /, "");
+  document.getElementById("footerLine1").textContent = loc.footerLine1 || "";
+  document.getElementById("footerLine2").textContent = loc.footerLine2 || "";
+
+  const terms = DNA.terms || {};
+  document.getElementById("limitText").textContent = terms.limitText || "";
+
+  const cta = DNA.callToAction || {};
+  const callBtn = document.getElementById("callBtn");
+  const callLink = document.getElementById("callLink");
+  callBtn.textContent = cta.buttonText || "TAP TO CALL";
+  callLink.href = cta.phoneTel || "#";
+
+  document.getElementById("modalFooter1").textContent = loc.footerLine1 || "";
+  document.getElementById("modalFooter2").textContent = loc.footerLine2 || "";
+  document.getElementById("modalLimit").textContent = terms.limitText || "";
+
+  // Prize list preview
+  const list = document.getElementById("prizeList");
+  const selected = (DNA.prizes || []).slice(0, WEDGE_COUNT);
+  list.innerHTML = selected.map(p => `<li><strong>${escapeHtml(p.amount || "")}</strong> — ${escapeHtml(p.description || "")}</li>`).join("");
+})();
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* =========================
+   WHEEL DRAW + SPIN ENGINE
+   ========================= */
+const wheelCanvas = document.getElementById("wheel");
+const wctx = wheelCanvas.getContext("2d");
+
+const prizesAll = Array.isArray(DNA.prizes) ? DNA.prizes.slice() : [];
+const prizes = prizesAll.slice(0, WEDGE_COUNT);
+const segmentCount = prizes.length;
+
+let rotation = 0;      // current wheel rotation (radians)
+let spinning = false;
+
+const pointerAngle = -Math.PI / 2; // top
+
+function hexToRgb(hex){
+  const h = String(hex || "").replace("#","");
+  if (h.length !== 6) return {r:255,g:255,b:255};
+  return {r:parseInt(h.slice(0,2),16), g:parseInt(h.slice(2,4),16), b:parseInt(h.slice(4,6),16)};
+}
+function mix(hexA, hexB, t){
+  const a = hexToRgb(hexA), b = hexToRgb(hexB);
+  const r = Math.round(a.r + (b.r-a.r)*t);
+  const g = Math.round(a.g + (b.g-a.g)*t);
+  const bl = Math.round(a.b + (b.b-a.b)*t);
+  return `rgb(${r},${g},${bl})`;
+}
+
+function drawWheel(){
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  const cssSize = wheelCanvas.getBoundingClientRect().width || 420;
+  const size = Math.round(cssSize * dpr);
+  if (wheelCanvas.width !== size) wheelCanvas.width = size;
+  if (wheelCanvas.height !== size) wheelCanvas.height = size;
+
+  const cx = size/2, cy = size/2;
+  const radius = size*0.48;
+
+  wctx.clearRect(0,0,size,size);
+
+  // Rim glow
+  const rimGrad = wctx.createRadialGradient(cx, cy, radius*0.55, cx, cy, radius*1.05);
+  rimGrad.addColorStop(0, "rgba(255,255,255,.06)");
+  rimGrad.addColorStop(1, "rgba(0,0,0,.35)");
+  wctx.fillStyle = rimGrad;
+  wctx.beginPath();
+  wctx.arc(cx, cy, radius*1.02, 0, Math.PI*2);
+  wctx.fill();
+
+  // Outer gold rim
+  wctx.lineWidth = radius*0.08;
+  wctx.strokeStyle = mix(getCss("--accent2"), getCss("--accent"), 0.35);
+  wctx.beginPath();
+  wctx.arc(cx, cy, radius*1.00, 0, Math.PI*2);
+  wctx.stroke();
+
+  // Segments
+  const seg = (Math.PI*2)/segmentCount;
+  const accent = getCss("--accent");
+  const accent2 = getCss("--accent2");
+  const baseA = mix(getCss("--primary"), accent, 0.25);
+  const baseB = mix(getCss("--primary"), accent2, 0.18);
+
+  for(let i=0;i<segmentCount;i++){
+    const start = rotation + i*seg;
+    const end = start + seg;
+
+    wctx.beginPath();
+    wctx.moveTo(cx,cy);
+    wctx.arc(cx,cy,radius,start,end);
+    wctx.closePath();
+
+    // alternate brand-tinted colors
+    wctx.fillStyle = (i%2===0) ? baseA : baseB;
+    wctx.fill();
+
+    // separator line
+    wctx.strokeStyle = "rgba(255,255,255,.18)";
+    wctx.lineWidth = Math.max(1, radius*0.006);
+    wctx.stroke();
+
+    // text
+    const p = prizes[i];
+    const amount = String(p.amount || "").trim();
+    const desc = String(p.description || "").trim();
+
+    const mid = start + seg/2;
+    wctx.save();
+    wctx.translate(cx,cy);
+    wctx.rotate(mid);
+
+    // amount text
+    wctx.textAlign = "right";
+    wctx.fillStyle = "rgba(255,255,255,.95)";
+    wctx.font = `900 ${Math.max(14, radius*0.075)}px system-ui, -apple-system, Segoe UI, Arial`;
+    wctx.fillText(amount, radius*0.90, -radius*0.03);
+
+    // description text (smaller)
+    wctx.fillStyle = "rgba(255,255,255,.85)";
+    wctx.font = `800 ${Math.max(10, radius*0.040)}px system-ui, -apple-system, Segoe UI, Arial`;
+    const clipped = (desc.length > 22) ? (desc.slice(0,22) + "…") : desc;
+    wctx.fillText(clipped, radius*0.90, radius*0.08);
+
+    wctx.restore();
+  }
+
+  // inner circle
+  wctx.fillStyle = "rgba(0,0,0,.18)";
+  wctx.beginPath();
+  wctx.arc(cx, cy, radius*0.22, 0, Math.PI*2);
+  wctx.fill();
+
+  // center highlight
+  const centerGrad = wctx.createRadialGradient(cx - radius*0.06, cy - radius*0.06, radius*0.02, cx, cy, radius*0.22);
+  centerGrad.addColorStop(0, "rgba(255,255,255,.35)");
+  centerGrad.addColorStop(1, "rgba(255,255,255,.06)");
+  wctx.fillStyle = centerGrad;
+  wctx.beginPath();
+  wctx.arc(cx, cy, radius*0.22, 0, Math.PI*2);
+  wctx.fill();
+
+  requestAnimationFrame(drawWheel);
+}
+drawWheel();
+
+function getCss(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+/* =========================
+   WIN SELECTION (WEIGHTS)
+   ========================= */
+function defaultWeight(prize){
+  const a = String(prize.amount || "").toUpperCase();
+
+  // Rare: big dollar or "MYSTERY"
+  if (a.includes("$50")) return 1;
+  if (a.includes("MYSTERY")) return 1.5;
+
+  // "FREE" should be rarer than small discounts, but still possible
+  if (a.includes("FREE")) return 2;
+
+  // Mid
+  if (a.includes("20%") || a.includes("$20")) return 4;
+
+  // Common
+  return 6;
+}
+
+function pickIndexWeighted(items){
+  const weights = items.map(p => (typeof p.weight === "number" && p.weight > 0) ? p.weight : defaultWeight(p));
+  const total = weights.reduce((s,w)=>s+w,0);
+  let r = Math.random() * total;
+  for(let i=0;i<weights.length;i++){
+    r -= weights[i];
+    if (r <= 0) return i;
+  }
+  return weights.length - 1;
+}
+
+/* =========================
+   SPIN + LANDING MATH
+   ========================= */
+function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+function spin(){
+  if (spinning) return;
+
+  if (isLocked()){
+    openModal({
+      amount: "SPIN LOCKED",
+      description: "This device already claimed a prize.",
+      code: "LOCKED",
+      isLockMessage: true
+    });
+    return;
+  }
+
+  spinning = true;
+  document.getElementById("spinBtn").disabled = true;
+
+  const winnerIndex = pickIndexWeighted(prizes);
+  const seg = (Math.PI*2)/segmentCount;
+
+  // Center angle of the winning segment
+  const segCenter = (winnerIndex + 0.5) * seg;
+
+  // Desired final rotation so that winning center lines up with pointer at top
+  // finalRotation mod 2π = pointerAngle - segCenter
+  const targetMod = pointerAngle - segCenter;
+
+  const spins = 6 + Math.floor(Math.random()*3); // 6-8
+  const startRot = rotation;
+  const endRot = (spins * Math.PI * 2) + targetMod;
+
+  const duration = 5200 + Math.random()*800; // ~5.2-6.0s
+  const startTime = performance.now();
+
+  function frame(now){
+    const t = Math.min(1, (now - startTime) / duration);
+    const eased = easeOutCubic(t);
+    rotation = startRot + (endRot - startRot) * eased;
+
+    if (t < 1){
+      requestAnimationFrame(frame);
+      return;
+    }
+
+    // Normalize rotation
+    rotation = ((rotation % (Math.PI*2)) + (Math.PI*2)) % (Math.PI*2);
+
+    // Confetti on any prize (always)
+    confettiBurst();
+
+    // Lock after win
+    setLocked();
+
+    // Show winner
+    openModal(prizes[winnerIndex]);
+
+    spinning = false;
+    document.getElementById("spinBtn").disabled = false;
+  }
+
+  requestAnimationFrame(frame);
+}
+
+/* =========================
+   LOCKING
+   ========================= */
+function isLocked(){
+  if (LOCK_MODE === "none") return false;
+
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const obj = JSON.parse(raw);
+
+    if (LOCK_MODE === "perDevice") return !!obj.locked;
+
+    if (LOCK_MODE === "perDay"){
+      const today = new Date();
+      const key = today.getFullYear()+"-"+(today.getMonth()+1)+"-"+today.getDate();
+      return obj.dayKey === key;
+    }
+  }catch(e){ return false; }
+
+  return false;
+}
+
+function setLocked(){
+  if (LOCK_MODE === "none") return;
+
+  try{
+    if (LOCK_MODE === "perDevice"){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({locked:true, ts: Date.now()}));
+      return;
+    }
+    if (LOCK_MODE === "perDay"){
+      const d = new Date();
+      const key = d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({dayKey:key, ts: Date.now()}));
+      return;
+    }
+  }catch(e){}
+}
+
+function clearLocked(){
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+}
+
+/* =========================
+   MODAL + CLAIM
+   ========================= */
+const modal = document.getElementById("modal");
+
+function openModal(prize){
+  const amount = String(prize.amount || "").trim();
+  const desc = String(prize.description || "").trim();
+  const code = String(prize.code || "").trim();
+
+  document.getElementById("winAmount").textContent = amount || "PRIZE";
+  document.getElementById("winDesc").textContent = desc || "";
+  document.getElementById("winCode").textContent = code || "CODE";
+
+  const claimTpl = (DNA.callToAction && DNA.callToAction.claimLine) ? DNA.callToAction.claimLine : "Mention code {CODE} when booking!";
+  document.getElementById("claimLine").textContent = claimTpl.replace("{CODE}", code || "CODE");
+
+  modal.classList.add("show");
+
+  // If lock message, hide call + spin again
+  const isLockMessage = !!prize.isLockMessage;
+  document.getElementById("callLink").style.display = isLockMessage ? "none" : "";
+  document.getElementById("spinAgainBtn").style.display = isLockMessage ? "none" : "";
+}
+
+function closeModal(){
+  modal.classList.remove("show");
+}
+
+/* =========================
+   CONFETTI
+   ========================= */
+const confCanvas = document.getElementById("confetti");
+const cctx = confCanvas.getContext("2d");
+let confettiParts = [];
+let confettiActiveUntil = 0;
+
+function resizeConfetti(){
+  const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  confCanvas.width = Math.floor(window.innerWidth * dpr);
+  confCanvas.height = Math.floor(window.innerHeight * dpr);
+  confCanvas.style.width = window.innerWidth + "px";
+  confCanvas.style.height = window.innerHeight + "px";
+  cctx.setTransform(dpr,0,0,dpr,0,0);
+}
+window.addEventListener("resize", resizeConfetti);
+resizeConfetti();
+
+function confettiBurst(){
+  const colors = [getCss("--accent"), getCss("--accent2"), "rgba(255,255,255,.9)"];
+  const count = 140;
+
+  const originX = window.innerWidth * 0.5;
+  const originY = window.innerHeight * 0.18;
+
+  for(let i=0;i<count;i++){
+    confettiParts.push({
+      x: originX,
+      y: originY,
+      vx: (Math.random()-0.5) * (6 + Math.random()*6),
+      vy: - (6 + Math.random()*10),
+      g: 0.22 + Math.random()*0.12,
+      r: 2 + Math.random()*4,
+      rot: Math.random()*Math.PI*2,
+      vr: (Math.random()-0.5)*0.25,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      life: 0,
+      ttl: 90 + Math.random()*40
+    });
+  }
+  confettiActiveUntil = performance.now() + 1900; // ~2s
+}
+
+function confettiLoop(now){
+  cctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+
+  if (confettiParts.length){
+    confettiParts = confettiParts.filter(p => p.life < p.ttl);
+    for(const p of confettiParts){
+      p.life++;
+      p.vy += p.g;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+
+      cctx.save();
+      cctx.translate(p.x, p.y);
+      cctx.rotate(p.rot);
+      cctx.fillStyle = p.color;
+      cctx.fillRect(-p.r, -p.r*0.6, p.r*2, p.r*1.2);
+      cctx.restore();
+    }
+  }
+
+  // Stop drawing after a short time unless particles still exist
+  if (now < confettiActiveUntil || confettiParts.length){
+    requestAnimationFrame(confettiLoop);
+  } else {
+    cctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+  }
+}
+requestAnimationFrame(confettiLoop);
+
+/* =========================
+   EVENTS
+   ========================= */
+document.getElementById("spinBtn").addEventListener("click", spin);
+document.querySelector(".wheelShell").addEventListener("click", spin);
+
+document.getElementById("resetBtn").addEventListener("click", () => {
+  clearLocked();
+  closeModal();
+});
+
+document.getElementById("closeModal").addEventListener("click", closeModal);
+modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+
+document.getElementById("spinAgainBtn").addEventListener("click", () => {
+  closeModal();
+  // If LOCK_MODE is perDevice/perDay, spinning again stays locked unless reset is used.
+  // To allow multiple spins per session, set LOCK_MODE = "none".
+});
+
+document.getElementById("copyBtn").addEventListener("click", async () => {
+  const code = document.getElementById("winCode").textContent.trim();
+  try{
+    await navigator.clipboard.writeText(code);
+    document.getElementById("copyBtn").textContent = "COPIED";
+    setTimeout(()=>document.getElementById("copyBtn").textContent="COPY", 900);
+  }catch(e){
+    // fallback
+    const ta = document.createElement("textarea");
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+    document.getElementById("copyBtn").textContent = "COPIED";
+    setTimeout(()=>document.getElementById("copyBtn").textContent="COPY", 900);
+  }
+});
+</script>
+</body>
+</html>
