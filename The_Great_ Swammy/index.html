@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>THE GREAT ALL-KNOWING SWAMMY</title>
+  <style>
+    :root {
+      --c-gold: #D4AF37;
+      --c-orb: #7FE7F5;
+      --c-spirit: #00d2ff;
+      --c-bg: #090308;
+      --font-main: "Georgia", serif;
+      --font-ui: system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; margin: 0; background: #000; overflow: hidden; position: fixed; width: 100%; }
+    
+    body { font-family: var(--font-ui); color: #f8eed8; display: flex; align-items: center; justify-content: center; }
+
+    .app {
+      width: min(1100px, 100%);
+      height: 100vh;
+      background: rgba(20, 5, 31, 0.98);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .inner { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 25px; height: 100%; }
+
+    /* --- BOOTH SIDE --- */
+    .booth {
+      position: relative;
+      height: 100%;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 2px solid var(--c-gold);
+      background: #000;
+    }
+    .swammy-portrait { width: 100%; height: 100%; object-fit: cover; animation: breathe 10s ease-in-out infinite; }
+    .orb-glow { position: absolute; left: 50%; bottom: 23%; transform: translateX(-50%); width: 150px; height: 150px; background: radial-gradient(circle, rgba(127, 231, 245, 0.4) 0%, transparent 75%); border-radius: 50%; filter: blur(20px); animation: pulse 4s infinite; pointer-events: none; z-index: 2; }
+    #particle-field { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+    .magic-orb { position: absolute; border-radius: 50%; background: #fff; box-shadow: 0 0 10px var(--c-orb); opacity: 0; }
+
+    /* --- UI SIDE: FULL CONTENT RESTORED --- */
+    .panel { display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: 5px 0; }
+    
+    .header-group { margin-bottom: 10px; }
+    .presents-tag { color: var(--c-gold); font-weight: 800; letter-spacing: 3px; text-transform: uppercase; font-size: 11px; margin: 0; }
+    .title { font-family: var(--font-main); font-size: clamp(1.8rem, 4vw, 3.2rem); color: #fff2cf; margin: 5px 0; text-transform: uppercase; line-height: 1.1; }
+    
+    .lead-up-group { margin-bottom: 10px; }
+    .step-up { color: var(--c-gold); font-style: italic; font-size: 1.2rem; margin: 0; }
+    .consult { font-size: 1rem; color: #d7c8a2; margin: 5px 0; line-height: 1.4; }
+
+    .whisper-box {
+      background: rgba(0,0,0,0.5);
+      border: 1px dashed rgba(212, 175, 55, 0.3);
+      border-radius: 15px;
+      padding: 10px;
+      min-height: 55px;
+      font-style: italic;
+      color: var(--c-orb);
+      font-size: 0.9rem;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 10px;
+    }
+
+    .interaction-center {
+      background: linear-gradient(180deg, rgba(0,0,0,0.8), rgba(40,10,60,0.5));
+      border: 1px solid var(--c-gold);
+      border-radius: 22px;
+      padding: 15px;
+      text-align: center;
+      flex-grow: 0;
+    }
+
+    .fortune-display { font-family: var(--font-main); font-size: clamp(1.4rem, 2.5vw, 1.9rem); min-height: 70px; display: flex; align-items: center; justify-content: center; color: #fff; margin-bottom: 10px; }
+
+    .btn-row { display: flex; gap: 12px; align-items: center; }
+    
+    .spirit-orb {
+      width: 60px; height: 60px;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--c-spirit));
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 0 15px var(--c-spirit);
+      flex-shrink: 0;
+    }
+    .spirit-orb.listening { animation: spiritWave 1s infinite alternate; box-shadow: 0 0 35px #fff; }
+
+    .ask-btn {
+      flex-grow: 1;
+      height: 60px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      background: linear-gradient(180deg, #f1d98f, #d4af37, #b08c2b);
+      color: #2a1200;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    }
+
+    .status-sub { color: var(--c-gold); font-size: 10px; letter-spacing: 2px; font-weight: bold; margin-top: 8px; text-transform: uppercase; }
+
+    .footer-credit { 
+      text-align: center; 
+      font-size: 11px; 
+      color: var(--c-gold); 
+      opacity: 0.8; 
+      padding-top: 15px; 
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    /* --- MOBILE STACKING (NO SCROLL) --- */
+    @media (max-width: 650px) {
+      .inner { display: flex; flex-direction: column; gap: 10px; }
+      .booth { height: 42vh; flex-shrink: 0; }
+      .panel { flex-grow: 1; justify-content: space-around; }
+      .title { font-size: 1.5rem; }
+      .step-up, .consult { font-size: 0.85rem; }
+      .whisper-box { min-height: 45px; margin-bottom: 5px; }
+      .interaction-center { padding: 10px; }
+      .fortune-display { min-height: 60px; font-size: 1.3rem; }
+      .spirit-orb { width: 50px; height: 50px; }
+      .ask-btn { height: 50px; font-size: 0.9rem; }
+    }
+
+    @keyframes spiritWave { from { transform: scale(1); filter: brightness(1); } to { transform: scale(1.1); filter: brightness(1.3); } }
+    @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.7; } }
+  </style>
+</head>
+<body>
+
+  <main class="app">
+    <div class="inner">
+      <section class="booth">
+        <img src="swammy-ui.jpg" class="swammy-portrait" alt="Swammy">
+        <div class="orb-glow"></div>
+        <div id="particle-field"></div>
+      </section>
+
+      <section class="panel">
+        <div class="header-group">
+          <p class="presents-tag">MachinoLabs Presents</p>
+          <h1 class="title">THE GREAT<br>ALL-KNOWING<br>SWAMMY</h1>
+        </div>
+
+        <div class="lead-up-group">
+          <p class="step-up">Step right up!</p>
+          <p class="consult">Consult the wisdom of <strong>THE GREAT ALL-KNOWING SWAMMY</strong></p>
+        </div>
+
+        <div class="whisper-box" id="whisper">"Touch the Spirit Orb to speak..."</div>
+
+        <div class="interaction-center">
+          <div id="fortune-text" class="fortune-display">"Ask and wait..."</div>
+          <div class="btn-row">
+            <div class="spirit-orb" id="micBtn"></div>
+            <button class="ask-btn" id="askBtn">Ask Swammy</button>
+          </div>
+          <p class="status-sub">Swammy Knows...</p>
+        </div>
+
+        <div class="footer-credit">Built By MachinoLabs ~ Joe 717.623.2907</div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const fortunes = [
+      "Most likely.", "The signs say yes.", "Doubt it.", "Not today.", 
+      "The future looks bright.", "Trust the process.", "A strong yes.",
+      "The stars are undecided.", "The mists are clearing... Yes.",
+      "No omen supports this.", "Patience is your best ally.",
+      "A surprise awaits you.", "Better not tell you now.",
+      "It is certain.", "My sources say no.", "Outlook good.",
+      "Very doubtful.", "Without a doubt.", "The answer is within you.",
+      "Beware of shadows.", "Success is near.", "Rest and ask again."
+    ];
+    
+    const field = document.getElementById('particle-field');
+    const micBtn = document.getElementById('micBtn');
+    const whisper = document.getElementById('whisper');
+    const askBtn = document.getElementById('askBtn');
+    const display = document.getElementById('fortune-text');
+
+    // --- MAGIC ORB CONFETTI ---
+    function createOrb() {
+      const orb = document.createElement('div');
+      orb.className = 'magic-orb';
+      const size = Math.random() * 6 + 2;
+      orb.style.width = size + 'px'; orb.style.height = size + 'px';
+      orb.style.left = '50%'; orb.style.bottom = '25%';
+      field.appendChild(orb);
+      orb.animate([
+        { transform: 'translate(-50%, 0) scale(0)', opacity: 0 },
+        { opacity: 1, offset: 0.1 },
+        { transform: `translate(${(Math.random()-0.5)*500}px, -450px) scale(1.6)`, opacity: 0 }
+      ], { duration: Math.random() * 3000 + 2000 }).onfinish = () => { orb.remove(); createOrb(); };
+    }
+    for(let i=0; i<35; i++) setTimeout(createOrb, i * 150);
+
+    // --- SPEECH TO TEXT ---
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (Recognition) {
+      const rec = new Recognition();
+      rec.onstart = () => { micBtn.classList.add('listening'); whisper.textContent = "Listening..."; };
+      rec.onresult = (e) => { whisper.textContent = `"${e.results[0][0].transcript}"`; };
+      rec.onend = () => micBtn.classList.remove('listening');
+      micBtn.onclick = () => rec.start();
+    }
+
+    // --- MYSTICAL ANNOYED VOICE ---
+    function speak(text) {
+      // We add leading commas to create a "hesitant/annoyed" pause
+      const grumpyText = ", , , , " + text;
+      const msg = new SpeechSynthesisUtterance(grumpyText);
+      msg.pitch = 0.45; // Deep
+      msg.rate = 0.75;  // Slow/Bothered
+      window.speechSynthesis.speak(msg);
+    }
+
+    askBtn.onclick = () => {
+      askBtn.disabled = true;
+      display.style.opacity = "0";
+      
+      // Psychic burst
+      for(let i=0; i<10; i++) createOrb();
+
+      setTimeout(() => {
+        const result = fortunes[Math.floor(Math.random() * fortunes.length)];
+        display.textContent = `"${result}"`;
+        display.style.opacity = "1";
+        speak(result);
+        askBtn.disabled = false;
+      }, 1200);
+    };
+
+    window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
+  </script>
+</body>
+</html>

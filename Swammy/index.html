@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>THE GREAT ALL-KNOWING SWAMMY</title>
+  <style>
+    :root {
+      --c-gold: #D4AF37;
+      --c-orb: #7FE7F5;
+      --c-bg: #090308;
+      --font-main: "Georgia", serif;
+      --font-ui: system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { height: 100%; margin: 0; background: #000; overflow: hidden; position: fixed; width: 100%; }
+    
+    body { font-family: var(--font-ui); color: #f8eed8; display: flex; align-items: center; justify-content: center; }
+
+    .app {
+      width: min(1100px, 100%);
+      height: 100vh;
+      background: rgba(20, 5, 31, 0.98);
+      border: 1px solid rgba(212, 175, 55, 0.3);
+      padding: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    .inner { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 25px; height: 100%; }
+
+    /* --- BOOTH SIDE --- */
+    .booth {
+      position: relative;
+      height: 100%;
+      border-radius: 24px;
+      overflow: hidden;
+      border: 2px solid var(--c-gold);
+      background: #000;
+    }
+    .swammy-portrait { width: 100%; height: 100%; object-fit: cover; animation: breathe 10s ease-in-out infinite; }
+    .orb-glow { position: absolute; left: 50%; bottom: 23%; transform: translateX(-50%); width: 150px; height: 150px; background: radial-gradient(circle, rgba(127, 231, 245, 0.4) 0%, transparent 75%); border-radius: 50%; filter: blur(20px); animation: pulse 4s infinite; pointer-events: none; z-index: 2; }
+    #particle-field { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+    .magic-orb { position: absolute; border-radius: 50%; background: #fff; box-shadow: 0 0 10px var(--c-orb); opacity: 0; }
+
+    /* --- UI SIDE --- */
+    .panel { display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: 5px 0; }
+    
+    .header-group { margin-bottom: 5px; }
+    .presents-tag { color: var(--c-gold); font-weight: 800; letter-spacing: 3px; text-transform: uppercase; font-size: 11px; margin: 0; }
+    .title { font-family: var(--font-main); font-size: clamp(1.8rem, 4vw, 3.2rem); color: #fff2cf; margin: 5px 0; text-transform: uppercase; line-height: 1.1; }
+    
+    .lead-up-group { margin-bottom: 10px; }
+    .step-up { color: var(--c-gold); font-style: italic; font-size: 1.2rem; margin: 0; }
+    .consult { font-size: 1rem; color: #d7c8a2; margin: 5px 0; line-height: 1.4; }
+
+    .interaction-center {
+      background: linear-gradient(180deg, rgba(0,0,0,0.8), rgba(40,10,60,0.5));
+      border: 1px solid var(--c-gold);
+      border-radius: 22px;
+      padding: 20px;
+      text-align: center;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .fortune-display { font-family: var(--font-main); font-size: clamp(1.4rem, 2.5vw, 1.9rem); min-height: 90px; display: flex; align-items: center; justify-content: center; color: #fff; margin-bottom: 15px; }
+
+    .ask-btn {
+      width: 100%;
+      height: 65px;
+      font-size: 1.2rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      background: linear-gradient(180deg, #f1d98f, #d4af37, #b08c2b);
+      color: #2a1200;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      transition: 0.2s;
+    }
+    .ask-btn:active { transform: scale(0.98); }
+
+    .status-sub { color: var(--c-gold); font-size: 10px; letter-spacing: 2px; font-weight: bold; margin-top: 15px; text-transform: uppercase; }
+
+    .footer-credit { 
+      text-align: center; 
+      font-size: 11px; 
+      color: var(--c-gold); 
+      opacity: 0.8; 
+      padding-top: 15px; 
+      border-top: 1px solid rgba(212, 175, 55, 0.2);
+    }
+
+    @media (max-width: 650px) {
+      .inner { display: flex; flex-direction: column; gap: 10px; }
+      .booth { height: 45vh; flex-shrink: 0; }
+      .panel { flex-grow: 1; justify-content: space-around; }
+      .title { font-size: 1.6rem; }
+      .interaction-center { padding: 15px; }
+    }
+
+    @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+    @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.7; } }
+  </style>
+</head>
+<body>
+
+  <main class="app">
+    <div class="inner">
+      <section class="booth">
+        <img src="swammy-ui.jpg" class="swammy-portrait" alt="Swammy">
+        <div class="orb-glow"></div>
+        <div id="particle-field"></div>
+      </section>
+
+      <section class="panel">
+        <div class="header-group">
+          <p class="presents-tag">MachinoLabs Presents</p>
+          <h1 class="title">THE GREAT<br>ALL-KNOWING<br>SWAMMY</h1>
+        </div>
+
+        <div class="lead-up-group">
+          <p class="step-up">Step right up!</p>
+          <p class="consult">Consult the wisdom of <strong>THE GREAT ALL-KNOWING SWAMMY</strong></p>
+        </div>
+
+        <div class="interaction-center">
+          <div id="fortune-text" class="fortune-display">"Consult the oracle..."</div>
+          <button class="ask-btn" id="askBtn">Ask Swammy</button>
+          <p class="status-sub">Swammy Knows...</p>
+        </div>
+
+        <div class="footer-credit">Built By MachinoLabs ~ Joe 717.623.2907</div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const fortunes = [
+      "Most likely.", "The signs say yes.", "Doubt it.", "Not today.", "The future looks bright.", 
+      "Trust the process.", "A strong yes.", "Perhaps in time.", "Success is near.", "Outlook good.",
+      "The stars are cold to this.", "Rest and ask again.", "Decidedly so.", "It is written."
+    ];
+
+    const businessDeals = [
+      "Swammy says: $1 Off any Appetizer!",
+      "The spirits decree: Free Soda with any meal!",
+      "Swammy sees... A free cookie with your coffee!",
+      "The oracle speaks: Upgrade to a Large for free!",
+      "The fates smile: $2 Off your next visit!"
+    ];
+    
+    const field = document.getElementById('particle-field');
+    const askBtn = document.getElementById('askBtn');
+    const display = document.getElementById('fortune-text');
+
+    function createOrb() {
+      const orb = document.createElement('div');
+      orb.className = 'magic-orb';
+      const size = Math.random() * 7 + 2;
+      orb.style.width = size + 'px'; orb.style.height = size + 'px';
+      orb.style.left = '50%'; orb.style.bottom = '25%';
+      field.appendChild(orb);
+      orb.animate([
+        { transform: 'translate(-50%, 0) scale(0)', opacity: 0 },
+        { opacity: 1, offset: 0.1 },
+        { transform: `translate(${(Math.random()-0.5)*550}px, -450px) scale(1.6)`, opacity: 0 }
+      ], { duration: Math.random() * 3000 + 2000 }).onfinish = () => { orb.remove(); createOrb(); };
+    }
+    for(let i=0; i<35; i++) setTimeout(createOrb, i * 150);
+
+    askBtn.onclick = () => {
+      askBtn.disabled = true;
+      display.style.opacity = "0";
+      for(let i=0; i<10; i++) createOrb();
+
+      setTimeout(() => {
+        let result;
+        // 20% prize chance, 80% regular fortune
+        if (Math.random() < 0.20) {
+            result = businessDeals[Math.floor(Math.random() * businessDeals.length)];
+            display.style.color = "var(--c-gold)"; 
+        } else {
+            result = fortunes[Math.floor(Math.random() * fortunes.length)];
+            display.style.color = "#fff";
+        }
+        display.textContent = `"${result}"`;
+        display.style.opacity = "1";
+        askBtn.disabled = false;
+      }, 1200);
+    };
+  </script>
+</body>
+</html>
