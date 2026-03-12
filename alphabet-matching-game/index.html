@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Alphabet Memory Match</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#4b8df8" />
+
+  <style>
+    :root {
+      --bg: #f7fafc;
+      --card-bg: #ffffff;
+      --text-main: #1a202c;
+      --accent: #4b8df8;
+      --accent-soft: #ebf4ff;
+      --danger: #e53e3e;
+      --success: #38a169;
+      --shadow-soft: 0 6px 16px rgba(15, 23, 42, 0.12);
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --transition-fast: 0.18s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top left, #e0f2fe 0, #f7fafc 55%, #fdf2ff 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 900px;
+      margin: 16px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      border-radius: 28px;
+      box-shadow: 0 18px 50px rgba(15, 23, 42, 0.22);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    header {
+      padding: 16px 20px 8px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .app-title-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      background: linear-gradient(135deg, #4b8df8, #f97316);
+      color: #ffffff;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.45);
+    }
+
+    .app-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .app-subtitle {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    .top-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+
+    .pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #1e40af;
+      font-weight: 600;
+    }
+
+    main {
+      flex: 1;
+      padding: 16px 16px 8px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .screen {
+      display: none;
+      height: 100%;
+      overflow: auto;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .screen-inner {
+      max-width: 840px;
+      margin: 0 auto;
+    }
+
+    /* HOME SCREEN */
+
+    .home-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .home-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .panel {
+      background: #ffffff;
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      padding: 16px 18px 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+
+    .panel p {
+      margin: 0 0 10px;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .chip {
+      padding: 7px 12px;
+      font-size: 0.85rem;
+      border-radius: 999px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .chip span.label-main {
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .chip span.label-sub {
+      font-size: 0.7rem;
+      color: #64748b;
+    }
+
+    .chip.active {
+      background: linear-gradient(135deg, #4b8df8, #f97316);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 10px 20px rgba(59, 130, 246, 0.55);
+      transform: translateY(-1px);
+    }
+
+    .chip.active span.label-main,
+    .chip.active span.label-sub {
+      color: #ffffff;
+    }
+
+    .mode-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .mode-card {
+      border-radius: 16px;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      padding: 10px 10px 9px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .mode-card-title {
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mode-card-desc {
+      color: #64748b;
+      line-height: 1.2;
+    }
+
+    .mode-card.active {
+      background: linear-gradient(135deg, #4b8df8, #22c55e);
+      border-color: transparent;
+      color: #ffffff;
+      box-shadow: 0 10px 26px rgba(59, 130, 246, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .mode-card.active .mode-card-title,
+    .mode-card.active .mode-card-desc {
+      color: #ffffff;
+    }
+
+    .start-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 160px;
+    }
+
+    .meta-mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 0.78rem;
+    }
+
+    .meta-pill {
+      border-radius: 999px;
+      padding: 6px 9px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .meta-pill span {
+      color: #0f172a;
+    }
+
+    .start-button {
+      margin-top: 10px;
+      padding: 11px 16px;
+      border-radius: 999px;
+      border: none;
+      background: radial-gradient(circle at top left, #f97316 0, #4b8df8 40%, #22c55e 100%);
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 14px 35px rgba(59, 130, 246, 0.6);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+    }
+
+    .start-button:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 18px 40px rgba(37, 99, 235, 0.7);
+    }
+
+    .start-button:active {
+      transform: translateY(0);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.55);
+    }
+
+    .start-button span.secondary-label {
+      font-size: 0.82rem;
+      font-weight: 500;
+      opacity: 0.9;
+    }
+
+    /* GAME SCREEN */
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .top-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ghost-btn {
+      border-radius: 999px;
+      border: 1px solid #e2e8f0;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      background: #ffffff;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: background var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .ghost-btn:hover {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      box-shadow: 0 8px 20px rgba(148, 163, 184, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .ghost-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 8px rgba(148, 163, 184, 0.4);
+    }
+
+    .top-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.78rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .status-pill {
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+    }
+
+    .status-pill.bad {
+      background: #fef2f2;
+      color: #b91c1c;
+    }
+
+    .status-pill.good {
+      background: #ecfdf5;
+      color: #15803d;
+    }
+
+    .status-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      opacity: 0.7;
+      letter-spacing: 0.06em;
+    }
+
+    .status-value {
+      font-size: 0.9rem;
+    }
+
+    .game-wrapper {
+      margin-top: 6px;
+      background: #f8fafc;
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: 0 10px 30px rgba(148, 163, 184, 0.45);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .cards-grid {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+    }
+
+    @media (min-width: 480px) {
+      .cards-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (min-width: 768px) {
+      .cards-grid[data-size="12"] {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .cards-grid[data-size="20"] {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      .cards-grid[data-size="26"] {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    .card {
+      width: 72px;
+      height: 90px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #e5f0ff, #ffffff);
+      box-shadow: 0 8px 20px rgba(148, 163, 184, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.5rem;
+      color: #0f172a;
+      cursor: pointer;
+      position: relative;
+      transform-style: preserve-3d;
+      perspective: 1000px;
+      transition: transform 0.22s ease-out, box-shadow 0.2s ease-out, filter 0.18s ease-out;
+      user-select: none;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.22s ease-out;
+      border-radius: inherit;
+    }
+
+    .card-front,
+    .card-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-back {
+      background: linear-gradient(135deg, #4b8df8, #f97316);
+      color: #ffffff;
+      font-size: 1.3rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .card-front {
+      transform: rotateY(180deg);
+      background: #ffffff;
+      border-radius: inherit;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card.matched {
+      background: linear-gradient(135deg, #22c55e, #a3e635);
+      box-shadow: 0 10px 24px rgba(34, 197, 94, 0.7);
+      cursor: default;
+      filter: none !important;
+    }
+
+    .card.matched .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card.matched .card-front {
+      background: transparent;
+      color: #ffffff;
+    }
+
+    .card.peeking .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card.disabled {
+      pointer-events: none;
+      filter: grayscale(0.1) opacity(0.95);
+    }
+
+    .card:active:not(.disabled):not(.matched) {
+      transform: translateY(1px);
+      box-shadow: 0 3px 10px rgba(148, 163, 184, 0.6);
+    }
+
+    .letter-display {
+      font-size: 2.1rem;
+      letter-spacing: 0.02em;
+    }
+
+    .letter-hint {
+      font-size: 0.7rem;
+      color: #94a3b8;
+      position: absolute;
+      bottom: 6px;
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
+
+    .game-bottom-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.8rem;
+      margin-top: 2px;
+    }
+
+    .bottom-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tiny-note {
+      color: #64748b;
+      font-size: 0.75rem;
+    }
+
+    .peek-btn {
+      border-radius: 999px;
+      border: none;
+      background: #fef9c3;
+      color: #854d0e;
+      padding: 6px 11px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(202, 138, 4, 0.35);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+    }
+
+    .peek-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 7px 16px rgba(202, 138, 4, 0.55);
+    }
+
+    .peek-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 9px rgba(202, 138, 4, 0.6);
+    }
+
+    /* WIN SCREEN */
+
+    .win-card {
+      background: #ffffff;
+      border-radius: 24px;
+      box-shadow: 0 14px 40px rgba(22, 163, 74, 0.55);
+      padding: 18px 18px 16px;
+      text-align: center;
+    }
+
+    .win-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 6px 0 12px;
+    }
+
+    .badge {
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge.gold {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    .badge.blue {
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .badge.green {
+      background: #ecfdf5;
+      color: #15803d;
+    }
+
+    .stars {
+      font-size: 1.4rem;
+      margin-bottom: 6px;
+    }
+
+    .stars span {
+      margin: 0 1px;
+    }
+
+    .win-stats {
+      font-size: 0.85rem;
+      color: #475569;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .win-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+    }
+
+    .primary-btn {
+      background: radial-gradient(circle at top left, #22c55e 0, #4b8df8 60%);
+      color: #ffffff;
+      box-shadow: 0 10px 28px rgba(22, 163, 74, 0.65);
+    }
+
+    .secondary-btn {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .primary-btn:hover,
+    .secondary-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+      box-shadow: 0 8px 22px rgba(148, 163, 184, 0.6);
+    }
+
+    .primary-btn:active,
+    .secondary-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(148, 163, 184, 0.6);
+    }
+
+    /* FOOTER */
+
+    footer {
+      padding: 8px 16px 10px;
+      border-top: 1px solid rgba(226, 232, 240, 0.9);
+      font-size: 0.75rem;
+      color: #64748b;
+      background: rgba(248, 250, 252, 0.96);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    footer strong {
+      color: #334155;
+    }
+
+    .footer-line {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .footer-note {
+      font-size: 0.74rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header>
+      <div class="app-title-block">
+        <div class="logo-badge">ABC</div>
+        <div>
+          <div class="app-title">Alphabet Memory Match</div>
+          <div class="app-subtitle">Flip, match, and learn uppercase & lowercase letters.</div>
+        </div>
+      </div>
+      <div class="top-controls">
+        <div class="pill">Offline-first • PWA</div>
+      </div>
+    </header>
+
+    <main>
+      <!-- HOME SCREEN -->
+      <section id="screen-home" class="screen active">
+        <div class="screen-inner">
+          <div class="home-layout">
+            <div class="panel">
+              <h2>Choose your board</h2>
+              <p>Pick how many cards you want to match. Bigger boards mean a bigger challenge.</p>
+              <div class="chips-row" id="board-size-row">
+                <button class="chip" data-size="12">
+                  <span class="label-main">12 cards</span>
+                  <span class="label-sub">Easy (6 pairs)</span>
+                </button>
+                <button class="chip" data-size="20">
+                  <span class="label-main">20 cards</span>
+                  <span class="label-sub">Medium (10 pairs)</span>
+                </button>
+                <button class="chip" data-size="26">
+                  <span class="label-main">26 cards</span>
+                  <span class="label-sub">Challenging (13 pairs)</span>
+                </button>
+              </div>
+
+              <h2 style="margin-top:14px;">Letter style</h2>
+              <p>Uppercase, lowercase, or a mix where A matches a?</p>
+              <div class="mode-options" id="mode-options">
+                <div class="mode-card" data-mode="upper">
+                  <div class="mode-card-title">UPPERCASE</div>
+                  <div class="mode-card-desc">Match big letters like A A.</div>
+                </div>
+                <div class="mode-card" data-mode="lower">
+                  <div class="mode-card-title">lowercase</div>
+                  <div class="mode-card-desc">Match smaller letters like a a.</div>
+                </div>
+                <div class="mode-card" data-mode="mixed">
+                  <div class="mode-card-title">Mixed Aa</div>
+                  <div class="mode-card-desc">Match pairs like A with a.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel start-panel">
+              <div>
+                <h2>Ready to play?</h2>
+                <p>Flip two cards at a time and try to remember where each letter is hiding.</p>
+                <div class="meta-mini-grid">
+                  <div class="meta-pill">
+                    <span>⏱</span><span>Timer & move counter</span>
+                  </div>
+                  <div class="meta-pill">
+                    <span>⭐</span><span>Best time saved per board</span>
+                  </div>
+                  <div class="meta-pill">
+                    <span>📱</span><span>Works offline after first load</span>
+                  </div>
+                </div>
+              </div>
+
+              <button id="start-game-btn" class="start-button">
+                <span>Start game</span>
+                <span class="secondary-label" id="start-summary-label">12 cards • uppercase</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- GAME SCREEN -->
+      <section id="screen-game" class="screen">
+        <div class="screen-inner">
+          <div class="top-bar">
+            <div class="top-bar-left">
+              <button id="back-home-btn" class="ghost-btn">
+                ← Home
+              </button>
+              <div class="status-pill">
+                <span class="status-label">Board</span>
+                <span class="status-value" id="status-board-label">12 cards • uppercase</span>
+              </div>
+            </div>
+            <div class="top-status">
+              <div class="status-pill">
+                <span class="status-label">Time</span>
+                <span class="status-value" id="status-time">00:00</span>
+              </div>
+              <div class="status-pill">
+                <span class="status-label">Moves</span>
+                <span class="status-value" id="status-moves">0</span>
+              </div>
+              <div class="status-pill good">
+                <span class="status-label">Best</span>
+                <span class="status-value" id="status-best">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="game-wrapper">
+            <div id="cards-grid" class="cards-grid" data-size="12">
+              <!-- cards injected here -->
+            </div>
+
+            <div class="game-bottom-bar">
+              <div class="bottom-actions">
+                <button id="restart-btn" class="ghost-btn">
+                  ⟲ Restart
+                </button>
+                <button id="peek-btn" class="peek-btn">
+                  👀 Peek (3s)
+                </button>
+              </div>
+              <div class="tiny-note">
+                Tip: Let kids try a smaller board first to build confidence.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- WIN SCREEN -->
+      <section id="screen-win" class="screen">
+        <div class="screen-inner">
+          <div class="win-card">
+            <div class="win-title">You matched all the letters!</div>
+            <div class="stars" id="win-stars">
+              ★ ★ ★
+            </div>
+
+            <div class="badge-row">
+              <div class="badge gold" id="win-board-label">12 cards • uppercase</div>
+              <div class="badge blue" id="win-time-label">Time: 00:00</div>
+              <div class="badge green" id="win-moves-label">Moves: 0</div>
+            </div>
+
+            <div class="win-stats">
+              <div id="win-best-time">Best time: —</div>
+              <div id="win-best-moves">Best moves: —</div>
+            </div>
+
+            <div class="win-buttons">
+              <button id="play-again-btn" class="primary-btn">
+                ⟲ Play again
+              </button>
+              <button id="change-board-btn" class="secondary-btn">
+                ← Change board
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-line">
+        <div>
+          <strong>Created by MachinoLabs</strong> • <strong>Designed by Joe Machino</strong>
+        </div>
+        <div>Alphabet Memory Match</div>
+      </div>
+      <div class="footer-note">
+        Alphabet Memory Match runs fully offline and stores everything safely on your device. No accounts, no syncing, and no internet required.
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // ------------------------------
+    // BASIC STATE
+    // ------------------------------
+    const boardSizes = [12, 20, 26];
+    const defaultSize = 12;
+    const defaultMode = 'upper'; // upper | lower | mixed
+
+    let currentSize = defaultSize;
+    let currentMode = defaultMode;
+
+    let cards = [];
+    let flipped = [];
+    let lockBoard = false;
+    let moves = 0;
+    let matches = 0;
+    let totalPairs = 0;
+
+    let timerId = null;
+    let startTime = null;
+
+    let lastConfigFromStorage = null;
+
+    const LS_PREFIX = 'abcMatch_';
+
+    // ------------------------------
+    // DOM
+    // ------------------------------
+    const screenHome = document.getElementById('screen-home');
+    const screenGame = document.getElementById('screen-game');
+    const screenWin = document.getElementById('screen-win');
+
+    const boardSizeRow = document.getElementById('board-size-row');
+    const modeOptions = document.getElementById('mode-options');
+    const startGameBtn = document.getElementById('start-game-btn');
+    const startSummaryLabel = document.getElementById('start-summary-label');
+
+    const backHomeBtn = document.getElementById('back-home-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const peekBtn = document.getElementById('peek-btn');
+
+    const cardsGrid = document.getElementById('cards-grid');
+
+    const statusBoardLabel = document.getElementById('status-board-label');
+    const statusTime = document.getElementById('status-time');
+    const statusMoves = document.getElementById('status-moves');
+    const statusBest = document.getElementById('status-best');
+
+    const winStars = document.getElementById('win-stars');
+    const winBoardLabel = document.getElementById('win-board-label');
+    const winTimeLabel = document.getElementById('win-time-label');
+    const winMovesLabel = document.getElementById('win-moves-label');
+    const winBestTime = document.getElementById('win-best-time');
+    const winBestMoves = document.getElementById('win-best-moves');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const changeBoardBtn = document.getElementById('change-board-btn');
+
+    // ------------------------------
+    // HELPERS
+    // ------------------------------
+    function showScreen(name) {
+      screenHome.classList.remove('active');
+      screenGame.classList.remove('active');
+      screenWin.classList.remove('active');
+
+      if (name === 'home') screenHome.classList.add('active');
+      if (name === 'game') screenGame.classList.add('active');
+      if (name === 'win') screenWin.classList.add('active');
+    }
+
+    function formatTime(ms) {
+      if (!ms || ms < 0) return '00:00';
+      const totalSeconds = Math.floor(ms / 1000);
+      const m = Math.floor(totalSeconds / 60);
+      const s = totalSeconds % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function getModeLabel(mode) {
+      if (mode === 'upper') return 'uppercase';
+      if (mode === 'lower') return 'lowercase';
+      if (mode === 'mixed') return 'mixed';
+      return mode;
+    }
+
+    function updateStartSummary() {
+      startSummaryLabel.textContent = `${currentSize} cards • ${getModeLabel(currentMode)}`;
+    }
+
+    // ------------------------------
+    // LOCAL STORAGE
+    // ------------------------------
+    function lsKeyBestTime(size, mode) {
+      return `${LS_PREFIX}bestTime_${size}_${mode}`;
+    }
+
+    function lsKeyBestMoves(size, mode) {
+      return `${LS_PREFIX}bestMoves_${size}_${mode}`;
+    }
+
+    function lsKeyLastConfig() {
+      return `${LS_PREFIX}lastConfig`;
+    }
+
+    function getBestTime(size, mode) {
+      const raw = localStorage.getItem(lsKeyBestTime(size, mode));
+      return raw ? Number(raw) : null;
+    }
+
+    function getBestMoves(size, mode) {
+      const raw = localStorage.getItem(lsKeyBestMoves(size, mode));
+      return raw ? Number(raw) : null;
+    }
+
+    function saveBestTime(size, mode, valueMs) {
+      const best = getBestTime(size, mode);
+      if (best == null || valueMs < best) {
+        localStorage.setItem(lsKeyBestTime(size, mode), String(valueMs));
+      }
+    }
+
+    function saveBestMoves(size, mode, value) {
+      const best = getBestMoves(size, mode);
+      if (best == null || value < best) {
+        localStorage.setItem(lsKeyBestMoves(size, mode), String(value));
+      }
+    }
+
+    function saveLastConfig(size, mode) {
+      const payload = { size, mode };
+      localStorage.setItem(lsKeyLastConfig(), JSON.stringify(payload));
+    }
+
+    function loadLastConfig() {
+      try {
+        const raw = localStorage.getItem(lsKeyLastConfig());
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!boardSizes.includes(parsed.size)) return null;
+        if (!['upper', 'lower', 'mixed'].includes(parsed.mode)) return null;
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // ------------------------------
+    // LETTER GENERATION
+    // ------------------------------
+    const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const LOWER = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+    function createCardSet(size, mode) {
+      const pairs = size / 2;
+      const baseLetters = UPPER.slice(0, pairs);
+
+      const result = [];
+      let idCounter = 0;
+
+      if (mode === 'upper') {
+        baseLetters.forEach(letter => {
+          const matchKey = letter;
+          for (let i = 0; i < 2; i++) {
+            result.push({
+              id: idCounter++,
+              letter: letter,
+              display: letter,
+              matchKey,
+              mode
+            });
+          }
+        });
+      } else if (mode === 'lower') {
+        baseLetters.forEach(letter => {
+          const lower = letter.toLowerCase();
+          const matchKey = lower;
+          for (let i = 0; i < 2; i++) {
+            result.push({
+              id: idCounter++,
+              letter: lower,
+              display: lower,
+              matchKey,
+              mode
+            });
+          }
+        });
+      } else if (mode === 'mixed') {
+        baseLetters.forEach(letter => {
+          const upper = letter;
+          const lower = letter.toLowerCase();
+          const matchKey = upper.toLowerCase();
+          result.push({
+            id: idCounter++,
+            letter: upper,
+            display: upper,
+            matchKey,
+            mode
+          });
+          result.push({
+            id: idCounter++,
+            letter: lower,
+            display: lower,
+            matchKey,
+            mode
+          });
+        });
+      }
+
+      // Shuffle
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+
+      return result;
+    }
+
+    // ------------------------------
+    // UI: BOARD SIZE & MODE SELECT
+    // ------------------------------
+    function setActiveBoardSizeButton(size) {
+      const buttons = boardSizeRow.querySelectorAll('.chip');
+      buttons.forEach(btn => {
+        const val = Number(btn.dataset.size);
+        btn.classList.toggle('active', val === size);
+      });
+    }
+
+    function setActiveModeCard(mode) {
+      const cards = modeOptions.querySelectorAll('.mode-card');
+      cards.forEach(card => {
+        const val = card.dataset.mode;
+        card.classList.toggle('active', val === mode);
+      });
+    }
+
+    function updateBestLabel() {
+      const bestTime = getBestTime(currentSize, currentMode);
+      const bestMoves = getBestMoves(currentSize, currentMode);
+
+      if (bestTime == null && bestMoves == null) {
+        statusBest.textContent = '—';
+        return;
+      }
+
+      const timeStr = bestTime != null ? formatTime(bestTime) : '—';
+      const movesStr = bestMoves != null ? `${bestMoves} moves` : '—';
+      statusBest.textContent = `${timeStr} • ${movesStr}`;
+    }
+
+    // ------------------------------
+    // GAME LIFECYCLE
+    // ------------------------------
+    function buildBoard() {
+      cards = createCardSet(currentSize, currentMode);
+      cardsGrid.innerHTML = '';
+      cardsGrid.setAttribute('data-size', currentSize);
+
+      cards.forEach(card => {
+        const cardEl = document.createElement('button');
+        cardEl.className = 'card';
+        cardEl.dataset.id = card.id;
+
+        cardEl.innerHTML = `
+          <div class="card-inner">
+            <div class="card-back">
+              ABC
+            </div>
+            <div class="card-front">
+              <div class="letter-display">${card.display}</div>
+              
+            </div>
+          </div>
+        `;
+
+        cardEl.addEventListener('click', () => handleCardClick(cardEl, card));
+        cardsGrid.appendChild(cardEl);
+      });
+    }
+
+    function resetGameState() {
+      flipped = [];
+      lockBoard = false;
+      moves = 0;
+      matches = 0;
+      totalPairs = currentSize / 2;
+
+      statusMoves.textContent = '0';
+      statusTime.textContent = '00:00';
+
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+      startTime = null;
+    }
+
+    function startTimer() {
+      if (timerId) return;
+      startTime = Date.now();
+      timerId = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        statusTime.textContent = formatTime(elapsed);
+      }, 250);
+    }
+
+    function stopTimer() {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+    }
+
+    function handleCardClick(cardEl, card) {
+      if (lockBoard) return;
+      if (cardEl.classList.contains('matched')) return;
+
+      const alreadyFlipped = cardEl.classList.contains('flipped');
+      if (alreadyFlipped) return;
+
+      if (!startTime) {
+        startTimer();
+      }
+
+      cardEl.classList.add('flipped');
+      flipped.push({ cardEl, card });
+
+      if (flipped.length === 2) {
+        moves++;
+        statusMoves.textContent = String(moves);
+        checkForMatch();
+      }
+    }
+
+    function checkForMatch() {
+      if (flipped.length !== 2) return;
+
+      const [first, second] = flipped;
+      const isMatch = first.card.matchKey === second.card.matchKey;
+
+      if (isMatch) {
+        first.cardEl.classList.add('matched', 'disabled');
+        second.cardEl.classList.add('matched', 'disabled');
+        matches++;
+
+        if (matches >= totalPairs) {
+          onGameComplete();
+        }
+
+        flipped = [];
+      } else {
+        lockBoard = true;
+        setTimeout(() => {
+          first.cardEl.classList.remove('flipped');
+          second.cardEl.classList.remove('flipped');
+          flipped = [];
+          lockBoard = false;
+        }, 900);
+      }
+    }
+
+    function onGameComplete() {
+      stopTimer();
+      const elapsed = startTime ? (Date.now() - startTime) : 0;
+      const timeStr = formatTime(elapsed);
+
+      saveBestTime(currentSize, currentMode, elapsed);
+      saveBestMoves(currentSize, currentMode, moves);
+      updateBestLabel();
+
+      // Stars: simple thresholds
+      let starCount = 3;
+      if (moves > totalPairs * 4) starCount = 2;
+      if (moves > totalPairs * 5.5) starCount = 1;
+
+      winStars.innerHTML = '';
+      for (let i = 0; i < 3; i++) {
+        const starChar = i < starCount ? '★' : '☆';
+        const span = document.createElement('span');
+        span.textContent = starChar;
+        winStars.appendChild(span);
+      }
+
+      const modeLabel = getModeLabel(currentMode);
+      const boardLabelText = `${currentSize} cards • ${modeLabel}`;
+      winBoardLabel.textContent = boardLabelText;
+      winTimeLabel.textContent = `Time: ${timeStr}`;
+      winMovesLabel.textContent = `Moves: ${moves}`;
+
+      const bestTime = getBestTime(currentSize, currentMode);
+      const bestMoves = getBestMoves(currentSize, currentMode);
+
+      winBestTime.textContent = `Best time: ${bestTime != null ? formatTime(bestTime) : '—'}`;
+      winBestMoves.textContent = `Best moves: ${bestMoves != null ? bestMoves : '—'}`;
+
+      showScreen('win');
+    }
+
+    function startNewGameFromHome() {
+      saveLastConfig(currentSize, currentMode);
+
+      statusBoardLabel.textContent = `${currentSize} cards • ${getModeLabel(currentMode)}`;
+      resetGameState();
+      buildBoard();
+      updateBestLabel();
+      showScreen('game');
+    }
+
+    function restartCurrentGame() {
+      resetGameState();
+      buildBoard();
+      updateBestLabel();
+    }
+
+    function peekAllCards() {
+      const allCards = cardsGrid.querySelectorAll('.card');
+      allCards.forEach(c => {
+        c.classList.add('peeking', 'disabled');
+      });
+
+      setTimeout(() => {
+        allCards.forEach(c => {
+          c.classList.remove('peeking');
+          if (!c.classList.contains('matched')) {
+            c.classList.remove('flipped');
+            c.classList.remove('disabled');
+          }
+        });
+      }, 3000);
+    }
+
+    // ------------------------------
+    // EVENT WIRING
+    // ------------------------------
+    function initBoardSizeButtons() {
+      boardSizeRow.querySelectorAll('.chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const size = Number(btn.dataset.size);
+          currentSize = size;
+          setActiveBoardSizeButton(size);
+          updateStartSummary();
+        });
+      });
+    }
+
+    function initModeCards() {
+      modeOptions.querySelectorAll('.mode-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const mode = card.dataset.mode;
+          currentMode = mode;
+          setActiveModeCard(mode);
+          updateStartSummary();
+        });
+      });
+    }
+
+    function initHomeScreen() {
+      // load last config
+      const last = loadLastConfig();
+      if (last) {
+        currentSize = last.size;
+        currentMode = last.mode;
+      } else {
+        currentSize = defaultSize;
+        currentMode = defaultMode;
+      }
+
+      setActiveBoardSizeButton(currentSize);
+      setActiveModeCard(currentMode);
+      updateStartSummary();
+
+      startGameBtn.addEventListener('click', startNewGameFromHome);
+    }
+
+    function initGameScreen() {
+      backHomeBtn.addEventListener('click', () => {
+        stopTimer();
+        showScreen('home');
+      });
+
+      restartBtn.addEventListener('click', () => {
+        restartCurrentGame();
+      });
+
+      peekBtn.addEventListener('click', () => {
+        peekAllCards();
+      });
+    }
+
+    function initWinScreen() {
+      playAgainBtn.addEventListener('click', () => {
+        restartCurrentGame();
+        showScreen('game');
+      });
+
+      changeBoardBtn.addEventListener('click', () => {
+        showScreen('home');
+      });
+    }
+
+    // ------------------------------
+    // PWA REGISTRATION
+    // ------------------------------
+    function registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(() => {
+          // silent fail
+        });
+      }
+    }
+
+    // ------------------------------
+    // INIT
+    // ------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+      initBoardSizeButtons();
+      initModeCards();
+      initHomeScreen();
+      initGameScreen();
+      initWinScreen();
+      registerServiceWorker();
+    });
+  </script>
+</body>
+</html>
