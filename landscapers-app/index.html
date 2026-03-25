@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crew Portal | StupidSimpleCrazyFast™</title>
+    <style>
+        :root {
+            /* --- MASTER TEMPLATE CONTROLS --- */
+            --brand-color: #2c3e50; /* Change this hex code to match the client's logo color */
+            
+            /* --- APP CONTROLS --- */
+            --primary-green: #2ecc71;
+            --dark-green: #27ae60;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .app-container {
+            background: #fff;
+            width: 100%;
+            max-width: 550px;
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        /* --- NEW COMPANY BRANDING HEADER --- */
+        .company-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        .company-name {
+            color: var(--brand-color);
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+        }
+        .portal-title {
+            color: #7f8c8d;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: bold;
+        }
+
+        h2 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 25px;
+            color: var(--text-color);
+        }
+        .form-group {
+            margin-bottom: 30px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px; /* Prevents iOS zoom */
+        }
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+        .btn-submit {
+            background-color: var(--primary-green);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-submit:hover {
+            background-color: var(--dark-green);
+        }
+        .btn-submit:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        #status-message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+            display: none;
+        }
+        .success { color: var(--dark-green); }
+        .error { color: #e74c3c; }
+
+        /* Custom MachinoLabs Footer Styles */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+            line-height: 1.5;
+            width: 100%;
+            max-width: 400px;
+        }
+        .footer a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .footer-tag {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="company-header">
+            <h1 class="company-name">Acme Landscaping Co.</h1>
+            <p class="portal-title">Field Crew Portal</p>
+        </div>
+
+        <h2>Log Completed Job</h2>
+        <form id="jobForm">
+            <div class="form-group">
+                <label for="customerName">Customer Name</label>
+                <input type="text" id="customerName" name="customerName" placeholder="e.g. Smith Residence" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="serviceType">Service Type</label>
+                <select id="serviceType" name="serviceType" required>
+                    <option value="" disabled selected>Select a service...</option>
+                    <option value="Mowing">Mowing</option>
+                    <option value="Mulching">Mulching</option>
+                    <option value="Cleanup">Cleanup</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Notes (Optional)</label>
+                <textarea id="notes" name="notes" placeholder="Any issues or extra work done?"></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Submit Job</button>
+            <div id="status-message"></div>
+        </form>
+    </div>
+
+    <footer class="footer"> 
+        <p class="footer-tag">Built with the StupidSimpleCrazyFast™ micro-app framework.</p> 
+        <div class="footer-credits"> 
+            Built by <a href="https://machinolabs.com" target="_blank">MachinoLabs</a> • 
+            <a href="https://machinolabs.com" target="_blank">machinolabs.com</a> • 
+            <a href="https://stupidsimplecrazyfast.com" target="_blank">stupidsimplecrazyfast.com</a> <br> 
+            Joe • 717.623.2907 
+        </div> 
+    </footer>
+
+    <script>
+        // --- YOUR LIVE API URL IS NOW HARDCODED HERE ---
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxHo7elbAosSGBJlgJqKYGX3CKTb2hNuXKjPzAcALg9S03201KwP3HL6zOg9g0C5_MG/exec';
+
+        const form = document.getElementById('jobForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const statusMsg = document.getElementById('status-message');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending...';
+            statusMsg.style.display = 'none';
+            statusMsg.className = '';
+
+            const formData = new FormData(form);
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.result === 'success') {
+                    statusMsg.textContent = '✅ Job successfully logged!';
+                    statusMsg.classList.add('success');
+                    form.reset();
+                } else {
+                    throw new Error('Script returned an error.');
+                }
+            })
+            .catch(error => {
+                statusMsg.textContent = '❌ Error saving job. Please try again.';
+                statusMsg.classList.add('error');
+                console.error('Error!', error.message);
+            })
+            .finally(() => {
+                statusMsg.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Job';
+                
+                setTimeout(() => {
+                    statusMsg.style.display = 'none';
+                }, 4000);
+            });
+        });
+    </script>
+</body>
+</html>
